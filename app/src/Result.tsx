@@ -23,7 +23,7 @@ export default function Result({ theme, layout, shots, onTheme, onRetake, onHome
   const share = async () => {
     const blob: Blob = await new Promise(r => canvas.toBlob(b => r(b!), 'image/png'))
     const file = new File([blob], fileName, { type: 'image/png' })
-    if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: 'camora' }).catch(() => {})
+    if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: 'Camora - Once in Frame' }).catch(() => {})
     else download()
   }
 

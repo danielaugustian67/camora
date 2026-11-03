@@ -6,10 +6,11 @@ import { Pipeline, DEFAULT_SETTINGS, type Settings } from './lib/pipeline'
 import { BACKGROUNDS, getBackground } from './lib/backgrounds'
 import { ACCESSORIES, type AccSlot } from './lib/accessories'
 import { GRADES } from './lib/grades'
+import { MAKEUP } from './lib/makeup'
 import { getFaceLandmarker, getSegmenter } from './lib/vision'
 
 type Tab = 'bg' | 'acc' | 'beauty' | 'warna' | 'atur'
-const LIPS = ['#d62839', '#ff4d6d', '#c9184a', '#ff8fab', '#b5651d', '#9d0208', '#e5989b']
+const LIPS = ['#c81d3a', '#e0455f', '#a4133c', '#e8899a', '#b5654a', '#7a0f22', '#d97a6c', '#c45a6a']
 
 const wait = (ms: number) => new Promise(r => setTimeout(r, ms))
 
@@ -18,7 +19,7 @@ export default function Booth({ theme, layout, onBack, onDone }: {
 }) {
   const n = LAYOUTS.find(l => l.id === layout)!.shots
   const aspect = geometry(layout).aspect
-  const outW = aspect >= 1 ? 1200 : Math.round(1200 * aspect)
+  const outW = aspect >= 1 ? 1500 : Math.round(1500 * aspect)
   const outH = Math.round(outW / aspect)
 
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -43,7 +44,7 @@ export default function Booth({ theme, layout, onBack, onDone }: {
     let stream: MediaStream | null = null
     let alive = true
     setCamErr(null)
-    navigator.mediaDevices?.getUserMedia({ video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 960 } }, audio: false })
+    navigator.mediaDevices?.getUserMedia({ video: { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1440 } }, audio: false })
       .then(s => {
         if (!alive) { s.getTracks().forEach(t => t.stop()); return }
         stream = s
@@ -59,7 +60,7 @@ export default function Booth({ theme, layout, onBack, onDone }: {
 
   // lazy-load models only when a feature needs them
   const needSeg = settings.bg !== 'none'
-  const needFace = settings.smooth > 0 || !!settings.lip || Object.values(settings.acc).some(Boolean)
+  const needFace = settings.makeup !== 'none' || settings.smooth > 0 || !!settings.lip || Object.values(settings.acc).some(Boolean)
   useEffect(() => {
     if (needSeg && !pipe.seg) { setLoading('Menyiapkan background virtual…'); getSegmenter().then(s => { pipe.seg = s; setLoading(null) }) }
   }, [needSeg, pipe])
@@ -217,13 +218,24 @@ export default function Booth({ theme, layout, onBack, onDone }: {
           {tab === 'beauty' && (
             <div className="sliders">
               <label>Haluskan kulit <input type="range" min={0} max={1} step={0.05} value={settings.smooth} onChange={e => set({ smooth: +e.target.value })} /></label>
-              <label>Cerahkan <input type="range" min={0} max={1} step={0.05} value={settings.bright} onChange={e => set({ bright: +e.target.value })} /></label>
+              <label>Cerahkan kulit <input type="range" min={0} max={1} step={0.05} value={settings.bright} onChange={e => set({ bright: +e.target.value })} /></label>
+              <h4>Makeup</h4>
+              <div className="looks">
+                {MAKEUP.map(m => (
+                  <button key={m.id} className={settings.makeup === m.id ? 'on' : ''} onClick={() => set({ makeup: m.id })}>
+                    <i style={{ background: m.swatch }} />{m.name}
+                  </button>
+                ))}
+              </div>
+              {settings.makeup !== 'none' && <label>Intensitas makeup <input type="range" min={0.1} max={1} step={0.05} value={settings.makeupAmt} onChange={e => set({ makeupAmt: +e.target.value })} /></label>}
               <h4>Warna bibir</h4>
               <div className="dots">
                 <button className={!settings.lip ? 'on' : ''} onClick={() => set({ lip: null })}>🚫</button>
                 {LIPS.map(c => <button key={c} className={settings.lip === c ? 'on' : ''} style={{ background: c }} onClick={() => set({ lip: c })} />)}
               </div>
-              <button className="ghost" onClick={() => set({ smooth: 0, bright: 0, lip: null })}>Reset beauty</button>
+              {settings.lip && <label>Intensitas bibir <input type="range" min={0.1} max={1} step={0.05} value={settings.lipAmt} onChange={e => set({ lipAmt: +e.target.value })} /></label>}
+              {settings.lip && <label>Kilau bibir (gloss) <input type="range" min={0} max={1} step={0.05} value={settings.gloss} onChange={e => set({ gloss: +e.target.value })} /></label>}
+              <button className="ghost" onClick={() => set({ smooth: 0, bright: 0, lip: null, makeup: 'none' })}>Reset beauty</button>
             </div>
           )}
 

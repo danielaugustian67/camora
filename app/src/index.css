@@ -124,3 +124,7 @@ h4 { margin: 14px 0 8px; font-size: 14px; color: var(--muted); font-weight: 500;
   .grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
   .thumb img { height: 200px; }
 }
+.looks { display: flex; gap: 8px; flex-wrap: wrap; }
+.looks button { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; padding: 4px; border-radius: 10px; border: 0; background: transparent; cursor: pointer; }
+.looks button i { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1px var(--line); }
+.looks button.on i { box-shadow: 0 0 0 3px var(--brand); }

@@ -46,8 +46,7 @@ export default function App() {
   return (
     <div className="pick">
       <header className="hero">
-        <h1>camora<span>.</span></h1>
-        <p>Photobooth mandiri langsung dari HP atau laptop. Pilih frame, gaya, lalu cekrek!</p>
+        <h1>Camora<span> - Once in Frame</span></h1>
       </header>
 
       <section className="layouts">
