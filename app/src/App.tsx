@@ -3,8 +3,9 @@ import { THEMES, LAYOUTS, CATEGORIES, type Theme, type LayoutId } from './lib/th
 import { renderFrame } from './lib/frame'
 import Booth from './Booth'
 import Result from './Result'
+import Landing from './Landing'
 
-type Step = 'pick' | 'booth' | 'result'
+type Step = 'landing' | 'pick' | 'booth' | 'result'
 
 function useFontsReady() {
   const [ready, setReady] = useState(false)
@@ -30,7 +31,7 @@ function Thumb({ theme, layout, active, onClick }: { theme: Theme; layout: Layou
 
 export default function App() {
   const fonts = useFontsReady()
-  const [step, setStep] = useState<Step>('pick')
+  const [step, setStep] = useState<Step>('landing')
   const [cat, setCat] = useState<string>('Semua')
   const [layout, setLayout] = useState<LayoutId>('strip3')
   const [theme, setTheme] = useState<Theme>(THEMES[0])
@@ -38,6 +39,7 @@ export default function App() {
 
   const list = cat === 'Semua' ? THEMES : THEMES.filter(t => t.cat === cat)
 
+  if (step === 'landing') return <Landing onStart={() => { setStep('pick'); scrollTo(0, 0) }} />
   if (step === 'booth')
     return <Booth theme={theme} layout={layout} onBack={() => setStep('pick')} onDone={s => { setShots(s); setStep('result') }} />
   if (step === 'result')
@@ -46,7 +48,7 @@ export default function App() {
   return (
     <div className="pick">
       <header className="hero">
-        <h1>Camora<span> - Once in Frame</span></h1>
+        <h1 onClick={() => setStep('landing')} style={{ cursor: 'pointer' }}>Camora<span> - Once in Frame</span></h1>
       </header>
 
       <section className="layouts">
